@@ -1,0 +1,80 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 5%;
+  row-gap: 20px;
+}
+
+.gal,
+.controls {  
+  width: 100%;
+  max-width: 500px;
+}
+
+.gal {
+  height: 250px;
+  overflow-x: hidden;
+}
+
+.gal__stack {
+  width: 400%;
+  height: 100%;
+  display: flex;
+}
+
+.gal__image {
+  width: 25%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.controls__btn-left,
+.controls__btn-right {
+  background: url('images/arrow-left.svg') no-repeat center;
+  background-size: 80%;
+  border: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.controls__btn-right {
+  background-image: url('images/arrow-right.svg');
+}
+
+button:disabled {
+  opacity: 0.2;
+}
+
+.controls__markers-list {
+  display: flex;
+  column-gap: 10px;
+}
+
+.controls__marker {
+  background: lightgray;
+  border: 1px solid white;
+  border-radius: 50%;
+  width: 11px;
+  height: 11px;
+}
+
+.controls__marker_current {
+  background: black;
+  border-color: black;
+}
