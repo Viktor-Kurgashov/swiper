@@ -1,5 +1,3 @@
-"use strict";
-
 class Swiper {
   constructor(container, btnLeft, btnRight, markersColl, currentMarkerClass) {
     this.container = container;
@@ -74,16 +72,23 @@ class Swiper {
       this.btnLeft.disabled = true;
       this.btnRight.disabled = false;
     }
-    else if (this.currentSlide === this.stack.childElementCount - 1) this.btnRight.disabled = true;
+    else if (this.currentSlide === this.slideCount) {
+      this.btnLeft.disabled = false;
+      this.btnRight.disabled = true;
+    }
     else this.btnLeft.disabled = this.btnRight.disabled = false;
   }
 
   setSizes() {
     this.stack.style.marginLeft = '0px';
     this.slideWidth = -this.container.offsetWidth;
-    this.limit = Math.round(this.container.offsetWidth * 0.125);
-    this.maxOffset = this.slideWidth * (this.stack.childElementCount - 1);
+    this.slideCount = this.stack.childElementCount - 1;
+
+    this.maxOffset = this.slideWidth * this.slideCount;
     this.touchStartPos = this.touchCurrentPos = undefined;
+    this.limit = Math.round(this.container.offsetWidth * 0.125);
+
+    
     this.currentSlide = 0;
     this.active = true;
     this.toggleMarker();
