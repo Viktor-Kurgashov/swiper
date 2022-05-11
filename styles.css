@@ -1,39 +1,71 @@
-* {
-  box-sizing: border-box;
-}
-
 body {
-  margin: 0;
-  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  min-height: 100vh;
   padding: 0 5%;
   row-gap: 20px;
 }
 
-.gal,
-.controls {  
+.gal {
   width: 100%;
   max-width: 500px;
-}
-
-.gal {
-  height: 250px;
   overflow-x: hidden;
 }
 
-.gal__stack {
-  width: 400%;
-  height: 100%;
+.gal__list {
+  width: 1000%;
   display: flex;
+  transition: margin-left 0.4s;
+}
+
+.gal__item {
+  width: 10%;
 }
 
 .gal__image {
-  width: 25%;
-  height: 100%;
+  min-height: 250px;
   object-fit: cover;
+}
+
+
+
+@media (min-width: 768px) {
+  .gal {
+    max-width: 800px;
+  }
+
+  .gal__list {
+    column-gap: 0.4%;
+  }
+
+  .gal__item {
+    width: 4.8%;
+  }
+}
+
+
+
+@media (min-width: 1024px) {
+  .gal {
+    max-width: 1200px;
+  }
+
+  .gal__list {
+    column-gap: 0.2%;
+  }
+
+  .gal__item {
+    width: 3.2%;
+  }
+}
+
+
+/*
+.controls {  
+  width: 100%;
+  max-width: 500px;
 }
 
 .controls {
@@ -46,11 +78,8 @@ body {
 .controls__btn-right {
   background: url('images/arrow-left.svg') no-repeat center;
   background-size: 80%;
-  border: none;
   width: 40px;
   height: 40px;
-  padding: 0;
-  cursor: pointer;
 }
 
 .controls__btn-right {
@@ -78,3 +107,4 @@ button:disabled {
   background: black;
   border-color: black;
 }
+*/

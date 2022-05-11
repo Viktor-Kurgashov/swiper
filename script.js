@@ -1,71 +1,151 @@
 class Swiper {
-  constructor(container, btnLeft, btnRight, markersColl, currentMarkerClass) {
+  constructor(container, /* btnLeft, btnRight, markersColl, currentMarkerClass */) {
     this.container = container;
     this.stack = container.firstElementChild;
-    this.btnLeft = btnLeft;
-    this.btnRight = btnRight;
-    this.markersColl = markersColl;
-    this.currentMarkerClass = currentMarkerClass;
+
+    this.touchFrom = this.touchCurrent = 0;
+    this.mouseFrom = this.mouseCurrent = 0;
+    this.mouseDown = false;
+
+    this.currentSlide = 0;
+    this.active = true;
     this.setSizes();
 
-
-
     window.addEventListener('resize', () => this.setSizes());
-
     this.stack.addEventListener('transitionend', () => this.unlock());
 
-    this.container.addEventListener('touchstart', event => this.touchStartPos = this.touchCurrentPos = event.changedTouches[0].clientX);
+    this.container.addEventListener('touchstart', e => this.touchStart(e));
+    this.container.addEventListener('touchmove', e => this.touchMove(e));
+    this.container.addEventListener('touchend', () => this.touchEnd());
 
-    this.container.addEventListener('touchmove', event => {
-      if (this.active) {
-        const offset = parseInt(this.stack.style.marginLeft) + (event.changedTouches[0].clientX - this.touchCurrentPos);
+    // this.container.addEventListener('mousedown', e => this.mouseStart(e));
+    // this.container.addEventListener('mousemove', e => this.mouseMove(e));
+    // this.container.addEventListener('mouseup', e => this.mouseEnd());
+    // this.container.addEventListener('mouseout', e => this.mouseEnd());
 
-        if (offset >= 0) this.stack.style.marginLeft = '0px';
-        else if (offset <= this.maxOffset) this.stack.style.marginLeft = this.maxOffset + 'px';
+    // this.btnLeft = btnLeft;
+    // this.btnRight = btnRight;
+    // this.markersColl = markersColl;
+    // this.currentMarkerClass = currentMarkerClass;
 
-        else {
-          this.stack.style.marginLeft = offset + 'px';
-          this.touchCurrentPos = event.changedTouches[0].clientX;
-
-          if (this.touchStartPos - this.touchCurrentPos > this.limit) this.moveTo(this.currentSlide + 1);
-          else if (this.touchStartPos - this.touchCurrentPos < -this.limit) this.moveTo(this.currentSlide - 1);
-        }
-      }
-    })
-
-    this.container.addEventListener('touchend', () => {
-      this.touchStartPos = this.touchCurrentPos = undefined;
-
-      if (this.active) {
-        this.moveTo(this.currentSlide, '0.1s');
-        setTimeout(() => this.unlock(), 100);
-      }
-    })
-
-    this.btnRight.addEventListener('click', () => this.moveTo(this.currentSlide + 1));
-    this.btnLeft.addEventListener('click', () => this.moveTo(this.currentSlide - 1));
+    // this.btnRight.addEventListener('click', () => this.moveTo(this.currentSlide + 1));
+    // this.btnLeft.addEventListener('click', () => this.moveTo(this.currentSlide - 1));
   }
 
 
 
-  moveTo(slide, time = '0.5s') {
-    this.active = false;
-    this.stack.style.transition = time;
-
-    this.currentSlide = slide;
-    this.stack.style.marginLeft = this.currentSlide * this.slideWidth + 'px';
-    this.toggleMarker();
+  touchStart (e) {
+    this.touchFrom = this.touchCurrent = e.changedTouches[0].clientX;
   }
+
+  touchMove (event) {
+    if (this.active) {
+      const offset = parseInt(this.stack.style.marginLeft) + event.changedTouches[0].clientX - this.touchCurrent;
+
+      if (offset <= this.maxOffset) this.stack.style.marginLeft = this.maxOffset + 'px';
+
+      else if (offset >= 0) this.stack.style.marginLeft = '0px';
+
+      else {
+        this.stack.style.marginLeft = offset + 'px';
+        this.touchCurrent = event.changedTouches[0].clientX;
+
+        if (this.touchFrom - this.touchCurrent > this.limit) this.moveTo(this.currentSlide + 1);
+
+        else if (this.touchFrom - this.touchCurrent < -this.limit) this.moveTo(this.currentSlide - 1);
+      }
+    }
+  }
+
+  touchEnd () {
+    if (this.active) {
+      this.moveTo(this.currentSlide, '0.1s');
+      setTimeout(() => this.unlock(), 100);
+    }
+    this.touchFrom = this.touchCurrent = 0;
+  }
+
+
+/*
+  mouseStart (event) {
+    this.mouseFrom = this.mouseCurrent = event.layerX;
+    this.mouseDown = true;
+  }
+
+  mouseMove (event) {
+    if (this.mouseDown && this.active) {
+      const offset = parseInt(this.stack.style.marginLeft) + event.layerX - this.mouseFrom;
+
+      if (offset <= this.maxOffset) this.stack.style.marginLeft = this.maxOffset + 'px';
+
+      else if (offset >= 0) this.stack.style.marginLeft = '0px';
+
+      else {
+        this.stack.style.marginLeft = offset + 'px';
+        this.mouseCurrent = event.layerX;
+
+        if (this.mouseFrom - this.mouseCurrent > this.limit) this.moveTo(this.currentSlide + 1);
+
+        else if (this.mouseFrom - this.mouseCurrent < -this.limit) this.moveTo(this.currentSlide - 1);
+      }
+    }
+  }
+
+  mouseEnd () {
+    if (this.active) {
+      this.moveTo(this.currentSlide, '0.2s');
+      setTimeout(() => this.unlock(), 200);
+    }
+    this.mouseFrom = this.mouseCurrent = 0;
+    this.mouseDown = false;
+  }
+*/
+
 
   unlock() {
     this.stack.style.transition = '';
     this.active = true;
   }
 
-  toggleMarker() {
-    for (let elem of this.markersColl) {
-      elem.classList.remove(this.currentMarkerClass);
+  moveTo(slide, time = '0.5s') {
+    this.active = false;
+    this.mouseDown = false;
+    this.currentSlide = slide;
+    this.stack.style.transition = time;
+    this.stack.style.marginLeft = this.slideWidth * slide + 'px';
+    // this.toggleMarker();
+  }
+
+  setSizes() {
+    if (window.matchMedia('(max-width: 767px)').matches) {
+      this.slideWidth = -this.container.offsetWidth;
+      this.slidesCount = this.stack.childElementCount - 1;
     }
+    else if (window.matchMedia('(max-width: 1023px)').matches) {
+      this.slideWidth = Math.round(this.container.offsetWidth * -52) / 100;
+      this.slidesCount = this.stack.childElementCount - 2;
+    }
+    else {
+      this.slideWidth = Math.round(this.container.offsetWidth * -34) / 100;
+      this.slidesCount = this.stack.childElementCount - 3;
+    }
+
+    this.maxOffset = this.slideWidth * this.slidesCount;
+    this.limit = Math.round(this.container.offsetWidth * 0.125);
+    if (this.limit > 80) this.limit = 80;
+
+    this.touchFrom = this.touchCurrent = 0;
+    this.mouseFrom = this.mouseCurrent = 0;
+
+    this.stack.style.marginLeft = '0px';
+    this.currentSlide = 0;
+    this.active = true;
+    // this.toggleMarker();
+  }
+/*
+  toggleMarker() {
+    for (let elem of this.markersColl) { elem.classList.remove(this.currentMarkerClass) }
+
     this.markersColl[this.currentSlide].classList.add(this.currentMarkerClass);
 
     if (this.currentSlide === 0) {
@@ -78,29 +158,15 @@ class Swiper {
     }
     else this.btnLeft.disabled = this.btnRight.disabled = false;
   }
-
-  setSizes() {
-    this.stack.style.marginLeft = '0px';
-    this.slideWidth = -this.container.offsetWidth;
-    this.slideCount = this.stack.childElementCount - 1;
-
-    this.maxOffset = this.slideWidth * this.slideCount;
-    this.touchStartPos = this.touchCurrentPos = undefined;
-    this.limit = Math.round(this.container.offsetWidth * 0.125);
-
-    
-    this.currentSlide = 0;
-    this.active = true;
-    this.toggleMarker();
-  }
+*/
 }
 
 
 
 let gal = new Swiper(
   document.getElementsByClassName('gal')[0],
-  document.getElementsByClassName('controls__btn-left')[0],
-  document.getElementsByClassName('controls__btn-right')[0],
-  document.getElementsByClassName('controls__marker'),
-  'controls__marker_current'
+  // document.getElementsByClassName('controls__btn-left')[0],
+  // document.getElementsByClassName('controls__btn-right')[0],
+  // document.getElementsByClassName('controls__marker'),
+  // 'controls__marker_current'
 );
